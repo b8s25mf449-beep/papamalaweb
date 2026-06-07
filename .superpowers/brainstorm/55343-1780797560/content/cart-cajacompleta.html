@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Papa Mala · Caja completa en el carrito</title>
+<style>
+  :root {
+    --bone: #FAF7F2;
+    --paper: #FFFFFF;
+    --tan: #E8DECE;
+    --ink: #0F0D0D;
+    --clay: #C41E1E;
+    --red-dark: #8B0000;
+    --green: #1E7A3D;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, 'Satoshi', system-ui, sans-serif;
+    background: #161616;
+    color: #eee;
+    padding: 24px;
+    min-height: 100vh;
+  }
+  h1 { font-size: 20px; font-weight: 900; color: var(--clay); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 28px; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+  .card { border: 2px solid #333; border-radius: 16px; overflow: hidden; cursor: pointer; transition: border-color 200ms ease, transform 200ms ease; background: #1e1e1e; }
+  .card:hover { border-color: #555; transform: translateY(-2px); }
+  .card.selected { border-color: var(--clay) !important; background: #200e0e; }
+  .card.selected .letter { background: var(--clay); }
+  .letter { background: #2a2a2a; color: white; font-weight: 900; font-size: 12px; padding: 7px 14px; display: block; letter-spacing: 0.06em; text-transform: uppercase; transition: background 200ms ease; }
+
+  /* ── SHARED DRAWER ─── */
+  .drawer-wrap {
+    background: var(--bone);
+    position: relative;
+    overflow: hidden;
+    height: 420px;
+  }
+  .page-bg {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    background: var(--bone);
+  }
+  .pm-nav {
+    background: var(--bone); border-bottom: 2px solid var(--ink);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 12px; position: relative; z-index: 2;
+    flex-shrink: 0;
+  }
+  .pm-logo { display: flex; align-items: center; gap: 5px; font-weight: 900; font-size: 14px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink); }
+  .pm-logo .tag { background: var(--clay); color: var(--bone); padding: 2px 5px 3px; border-radius: 5px; }
+  .pm-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--clay); flex-shrink: 0; }
+  .pm-cart-btn {
+    width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--ink);
+    background: var(--ink); color: var(--bone);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; position: relative;
+  }
+  .pm-cart-badge {
+    position: absolute; top: -5px; right: -5px; width: 16px; height: 16px;
+    border-radius: 50%; background: var(--clay); color: white;
+    font-size: 9px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid var(--bone);
+  }
+  .bg-content { flex: 1; background: linear-gradient(var(--tan) 0 80px, var(--bone) 80px); opacity: 0.3; }
+  .overlay { position: absolute; inset: 0; background: rgba(15,13,13,0.5); z-index: 3; }
+
+  /* ── DRAWER PANEL ─── */
+  .drawer {
+    position: absolute; top: 0; right: 0; bottom: 0;
+    width: 230px;
+    background: var(--paper);
+    border-left: 2px solid var(--ink);
+    z-index: 4;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .drawer-head {
+    padding: 11px 13px;
+    border-bottom: 2px solid var(--ink);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bone);
+    flex-shrink: 0;
+  }
+  .drawer-title { font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink); }
+  .close-btn { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--ink); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--ink); }
+  .drawer-body { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .cart-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px; border: 2px solid var(--ink);
+    border-radius: 10px; background: var(--bone);
+  }
+  .swatch { width: 30px; height: 30px; border-radius: 7px; border: 2px solid var(--ink); flex-shrink: 0; }
+  .item-info { flex: 1; min-width: 0; }
+  .item-name { font-size: 11px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item-price { font-size: 10px; color: var(--ink); opacity: 0.5; margin-top: 1px; }
+  .qty-row { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+  .qty-btn { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--ink); background: transparent; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: var(--ink); }
+  .qty-n { font-size: 11px; font-weight: 700; color: var(--ink); width: 14px; text-align: center; }
+
+  /* ── CAJA COMPLETA VARIANTS ─── */
+
+  /* Opción A: Upsell banner al final de los items */
+  .upsell-banner {
+    display: flex; flex-direction: column; gap: 6px;
+    padding: 10px 11px;
+    border: 2px dashed var(--clay);
+    border-radius: 10px;
+    background: #fff5f5;
+  }
+  .upsell-label { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; color: var(--clay); }
+  .upsell-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .upsell-name { font-size: 11px; font-weight: 700; color: var(--ink); }
+  .upsell-price { font-size: 10px; font-weight: 700; color: var(--ink); opacity: 0.6; }
+  .upsell-add { height: 26px; border-radius: 100px; border: 2px solid var(--clay); background: var(--clay); color: white; font-size: 10px; font-weight: 900; padding: 0 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+
+  /* Opción B: Item especial (igual que bolsas) */
+  .cart-item-special {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px; border: 2px solid var(--clay);
+    border-radius: 10px; background: #fff5f5;
+  }
+  .swatch-box {
+    width: 30px; height: 30px; border-radius: 7px; border: 2px solid var(--clay);
+    background: var(--clay); color: white; font-size: 16px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+
+  /* Opción C: Separador + botón independiente */
+  .sep-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 9px; font-weight: 900; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--ink); opacity: 0.35; white-space: nowrap;
+  }
+  .sep-label::before, .sep-label::after { content: ''; flex: 1; height: 1px; background: var(--ink); opacity: 0.2; }
+  .mayoreo-btn {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 11px;
+    border: 2px solid var(--ink); border-radius: 10px;
+    background: var(--ink); color: var(--bone);
+    gap: 6px;
+  }
+  .mayoreo-left { display: flex; flex-direction: column; gap: 2px; }
+  .mayoreo-name { font-size: 11px; font-weight: 700; }
+  .mayoreo-sub { font-size: 9px; opacity: 0.55; }
+  .mayoreo-price { font-size: 12px; font-weight: 900; }
+
+  /* ── DRAWER FOOTER ─── */
+  .drawer-foot {
+    padding: 11px 13px;
+    border-top: 2px solid var(--ink);
+    background: var(--bone);
+    flex-shrink: 0;
+  }
+  .total-row { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+  .total-sub { font-size: 10px; opacity: 0.5; font-weight: 500; margin-bottom: 7px; color: var(--ink); }
+  .pay-btn { width: 100%; height: 34px; border-radius: 100px; border: 2px solid var(--ink); background: var(--clay); color: var(--bone); font-size: 11px; font-weight: 900; letter-spacing: 0.05em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 5px; }
+
+  /* ── CARD FOOTER ─── */
+  .card-desc { padding: 12px 14px; background: #1e1e1e; }
+  .card-desc h3 { font-size: 14px; font-weight: 700; color: #eee; margin-bottom: 4px; }
+  .card-desc p { font-size: 12px; color: #777; line-height: 1.45; }
+  .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 100px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 5px; }
+  .badge-r { background: var(--clay); color: white; }
+  .badge-g { background: var(--green); color: white; }
+  .badge-b { background: #1a3a6e; color: white; }
+
+  /* ── SELECTION BAR ─── */
+  #sel-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--clay); color: white; text-align: center; padding: 13px; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; transform: translateY(100%); transition: transform 300ms ease; z-index: 50; }
+  #sel-bar.show { transform: translateY(0); }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<h1>¿Cómo aparece la "caja completa"?</h1>
+<p class="subtitle">Comprar bolsas ($35 c/u) y pedir a mayoreo ($1,550) son dos flujos distintos. ¿Cómo los integramos en el carrito?</p>
+
+<div class="grid">
+
+  <!-- ── A: UPSELL DENTRO DEL DRAWER ─── -->
+  <div class="card" data-choice="a" onclick="choose(this)">
+    <div class="letter">A · Upsell dentro del drawer</div>
+    <div class="drawer-wrap">
+      <div class="page-bg">
+        <div class="pm-nav">
+          <div class="pm-logo"><div class="pm-dot"></div> PAPA <span class="tag">MALA</span></div>
+          <div class="pm-cart-btn">🛒<div class="pm-cart-badge">2</div></div>
+        </div>
+        <div class="bg-content"></div>
+      </div>
+      <div class="overlay"></div>
+      <div class="drawer">
+        <div class="drawer-head">
+          <span class="drawer-title">Tu orden (2)</span>
+          <div class="close-btn">✕</div>
+        </div>
+        <div class="drawer-body">
+          <div class="cart-item">
+            <div class="swatch" style="background:#C41E1E;"></div>
+            <div class="item-info"><div class="item-name">Flama</div><div class="item-price">$35 · 100g</div></div>
+            <div class="qty-row"><div class="qty-btn">−</div><div class="qty-n">1</div><div class="qty-btn">+</div></div>
+          </div>
+          <div class="cart-item">
+            <div class="swatch" style="background:#D8A21E;"></div>
+            <div class="item-info"><div class="item-name">Queso Jalapeño</div><div class="item-price">$35 · 100g</div></div>
+            <div class="qty-row"><div class="qty-btn">−</div><div class="qty-n">1</div><div class="qty-btn">+</div></div>
+          </div>
+          <!-- UPSELL -->
+          <div class="upsell-banner">
+            <div class="upsell-label">¿Quieres más?</div>
+            <div class="upsell-row">
+              <div>
+                <div class="upsell-name">Caja completa</div>
+                <div class="upsell-price">11 sabores · $1,550</div>
+              </div>
+              <button class="upsell-add">📦 Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="drawer-foot">
+          <div class="total-row"><span>Subtotal</span><span>$70</span></div>
+          <button class="pay-btn">📱 Pedir por WhatsApp</button>
+        </div>
+      </div>
+    </div>
+    <div class="card-desc">
+      <div class="badge badge-r">⭐ Recomendado</div>
+      <h3>Sugerencia de upsell</h3>
+      <p>El carrito sugiere la caja completa como upgrade. Si la agregan, se va directo a WhatsApp de mayoreo. Sutil pero efectivo.</p>
+    </div>
+  </div>
+
+  <!-- ── B: ITEM ESPECIAL IGUAL QUE LOS DEMÁS ─── -->
+  <div class="card" data-choice="b" onclick="choose(this)">
+    <div class="letter">B · Item especial en el carrito</div>
+    <div class="drawer-wrap">
+      <div class="page-bg">
+        <div class="pm-nav">
+          <div class="pm-logo"><div class="pm-dot"></div> PAPA <span class="tag">MALA</span></div>
+          <div class="pm-cart-btn">🛒<div class="pm-cart-badge">3</div></div>
+        </div>
+        <div class="bg-content"></div>
+      </div>
+      <div class="overlay"></div>
+      <div class="drawer">
+        <div class="drawer-head">
+          <span class="drawer-title">Tu orden (3)</span>
+          <div class="close-btn">✕</div>
+        </div>
+        <div class="drawer-body">
+          <div class="cart-item">
+            <div class="swatch" style="background:#C41E1E;"></div>
+            <div class="item-info"><div class="item-name">Flama</div><div class="item-price">$35 · 100g</div></div>
+            <div class="qty-row"><div class="qty-btn">−</div><div class="qty-n">2</div><div class="qty-btn">+</div></div>
+          </div>
+          <!-- CAJA COMPLETA como item especial -->
+          <div class="cart-item-special">
+            <div class="swatch-box">📦</div>
+            <div class="item-info">
+              <div class="item-name" style="color:var(--clay);">Caja completa</div>
+              <div class="item-price" style="color:var(--clay); opacity:0.7;">11 sabores · Mayoreo</div>
+            </div>
+            <div style="font-size:11px;font-weight:900;color:var(--clay);flex-shrink:0;">$1,550</div>
+          </div>
+        </div>
+        <div class="drawer-foot">
+          <div class="total-row"><span>Total</span><span>$1,620</span></div>
+          <div class="total-sub">Incluye caja completa · envío a convenir</div>
+          <button class="pay-btn">📱 Pedir por WhatsApp</button>
+        </div>
+      </div>
+    </div>
+    <div class="card-desc">
+      <div class="badge badge-g">📦 Mixto</div>
+      <h3>Caja completa como item</h3>
+      <p>Se puede mezclar en el mismo pedido. El total incluye la caja. Un solo mensaje de WhatsApp con todo.</p>
+    </div>
+  </div>
+
+  <!-- ── C: FLUJOS SEPARADOS ─── -->
+  <div class="card" data-choice="c" onclick="choose(this)">
+    <div class="letter">C · Flujos completamente separados</div>
+    <div class="drawer-wrap">
+      <div class="page-bg">
+        <div class="pm-nav">
+          <div class="pm-logo"><div class="pm-dot"></div> PAPA <span class="tag">MALA</span></div>
+          <div class="pm-cart-btn">🛒<div class="pm-cart-badge">2</div></div>
+        </div>
+        <div class="bg-content"></div>
+      </div>
+      <div class="overlay"></div>
+      <div class="drawer">
+        <div class="drawer-head">
+          <span class="drawer-title">Tu orden (2)</span>
+          <div class="close-btn">✕</div>
+        </div>
+        <div class="drawer-body">
+          <div class="cart-item">
+            <div class="swatch" style="background:#C41E1E;"></div>
+            <div class="item-info"><div class="item-name">Flama</div><div class="item-price">$35 · 100g</div></div>
+            <div class="qty-row"><div class="qty-btn">−</div><div class="qty-n">1</div><div class="qty-btn">+</div></div>
+          </div>
+          <div class="cart-item">
+            <div class="swatch" style="background:#7A2E1E;"></div>
+            <div class="item-info"><div class="item-name">Chipotle</div><div class="item-price">$35 · 100g</div></div>
+            <div class="qty-row"><div class="qty-btn">−</div><div class="qty-n">1</div><div class="qty-btn">+</div></div>
+          </div>
+          <!-- SEPARADOR + MAYOREO SECTION -->
+          <div class="sep-label">También disponible</div>
+          <div class="mayoreo-btn">
+            <div class="mayoreo-left">
+              <div class="mayoreo-name">📦 Caja completa</div>
+              <div class="mayoreo-sub">11 sabores · Mayoreo</div>
+            </div>
+            <div class="mayoreo-price">$1,550</div>
+          </div>
+        </div>
+        <div class="drawer-foot">
+          <div class="total-row"><span>Subtotal bolsas</span><span>$70</span></div>
+          <button class="pay-btn">📱 Pedir por WhatsApp</button>
+        </div>
+      </div>
+    </div>
+    <div class="card-desc">
+      <div class="badge badge-b">🔀 Separado</div>
+      <h3>Flujos paralelos, sin mezclar</h3>
+      <p>El carrito gestiona bolsas. La caja completa aparece como referencia en el drawer, pero abre su propio flujo de WhatsApp. Totales no se mezclan.</p>
+    </div>
+  </div>
+
+</div>
+
+<div id="sel-bar">✓ &nbsp;Seleccionado — dime tu elección en el chat</div>
+
+<script>
+  function choose(el) {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('sel-bar').classList.add('show');
+    if (window.__brainHelper) {
+      window.__brainHelper.emit({ type: 'click', choice: el.dataset.choice, text: el.querySelector('.letter').textContent.trim() });
+    }
+  }
+</script>
+</body>
+</html>
