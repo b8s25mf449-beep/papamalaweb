@@ -2,7 +2,7 @@
 // Sección "Origen" — historia de la marca con foto graffiti y pills de atributos.
 
 (function () {
-  const ATTRIBUTES = ["Sin gluten", "Sin saborizantes artificiales", "Lotes pequeños", "Veggie"];
+  const ATTRIBUTES = ["Sin gluten", "Hechas con ingredientes naturales", "Lotes pequeños", "Veggie"];
 
   function Manifesto() {
     return (
