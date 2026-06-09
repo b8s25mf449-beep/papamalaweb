@@ -35,6 +35,8 @@
 
     const onChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
+    const sanitize = (str, max) => (str || "").trim().replace(/[<>"'`]/g, "").slice(0, max);
+
     const submit = (e) => {
       e.preventDefault();
       if (state === "sending") return;
@@ -42,15 +44,19 @@
 
       timers.current.push(setTimeout(() => {
         setState("done");
-        // Construye el mensaje para WhatsApp con los datos del formulario
+        const n = sanitize(form.nombre,   80);
+        const c = sanitize(form.correo,   120);
+        const t = sanitize(form.telefono, 20);
+        const ci= sanitize(form.ciudad,   80);
+        const m = sanitize(form.mensaje,  500);
         const lines = [
           "👋 *Nuevo contacto desde Papa Mala*",
           "",
-          `*Nombre:*   ${form.nombre}`,
-          form.correo   ? `*Correo:*    ${form.correo}`    : null,
-          form.telefono ? `*Teléfono:*  ${form.telefono}`  : null,
-          form.ciudad   ? `*Ciudad:*    ${form.ciudad}`    : null,
-          form.mensaje  ? `\n*Mensaje:*\n${form.mensaje}`  : null,
+          `*Nombre:*   ${n}`,
+          c  ? `*Correo:*    ${c}`   : null,
+          t  ? `*Teléfono:*  ${t}`   : null,
+          ci ? `*Ciudad:*    ${ci}`  : null,
+          m  ? `\n*Mensaje:*\n${m}`  : null,
         ].filter(Boolean).join("\n");
         window.openWhatsApp(lines);
       }, 1400));
