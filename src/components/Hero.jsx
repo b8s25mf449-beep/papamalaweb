@@ -78,9 +78,9 @@
     badge       = "Snacks saludables de malanga",
   }) {
     const STATS = [
-      ["100", "%", "malanga real"],
-      ["0",   "",  "saborizantes artif."],
-      ["11",  "",  "sabores con actitud"],
+      ["100", "%",  "malanga real"],
+      [null,  null, "Crujido Garantizado"],
+      ["11",  "",   "sabores con actitud"],
     ];
 
     return (
@@ -131,8 +131,11 @@
             <Reveal delay={0.48} className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-3">
               {STATS.map(([n, suf, t]) => (
                 <div key={t} className="flex items-baseline gap-2">
-                  <CountUp value={Number(n)} suffix={suf} className="font-display text-[30px] leading-none text-[var(--clay)]" />
-                  <span className="max-w-[10ch] text-[12.5px] font-semibold leading-tight text-[var(--ink)]/60">{t}</span>
+                  {n !== null
+                    ? <><CountUp value={Number(n)} suffix={suf} className="font-display text-[30px] leading-none text-[var(--clay)]" />
+                        <span className="max-w-[10ch] text-[12.5px] font-semibold leading-tight text-[var(--ink)]/60">{t}</span></>
+                    : <span className="font-display text-[22px] uppercase leading-tight tracking-tight text-[var(--clay)]">{t}</span>
+                  }
                 </div>
               ))}
             </Reveal>
