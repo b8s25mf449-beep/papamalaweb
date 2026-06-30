@@ -1,7 +1,7 @@
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 // Sección principal: headline, CTA, mascota con círculo, stickers flotantes
 // y contadores animados.
-// Props: logoSrc, circleColor, badge
+// Props: logoSrc, circleColor, badge, cmsText (textos editables desde el CMS)
 
 (function () {
   const { useRef, useState, useEffect } = React;
@@ -76,11 +76,26 @@
     logoSrc     = window.ASSET.mascotSticker,
     circleColor = "#C41E1E",
     badge       = "Snacks saludables de malanga",
+    cmsText     = null,
   }) {
+    const t = cmsText || {};
+
+    const titleLines = [t.line1, t.line2, t.line3].filter(Boolean);
+    const lines = titleLines.length ? titleLines : ["La papa", "que se", "porta"];
+    const accentLine = t.line4 || "mal";
+
+    const description = t.description ||
+      "Malanga rebanada a mano, horneada en lotes pequeños y preparada con ingredientes de calidad. Crujiente con mala actitud, pero buena conciencia.";
+
+    const buyLabel = t.buyLabel || "Comprar a Mayoreo";
+    const buyPrice = t.buyPrice || "$1550";
+    const buyMessage = t.buyMessage ||
+      "Hola Papa Mala 👋 Me interesa una compra a mayoreo. ¿Me pueden dar más información?";
+
     const STATS = [
-      ["100", "%",  "malanga real"],
-      [null,  null, "Crujido Garantizado"],
-      ["11",  "",   "sabores con actitud"],
+      [t.stat1_n || "100", t.stat1_suf ?? "%", t.stat1_label || "malanga real"],
+      [null, null, t.stat2_label || "Crujido Garantizado"],
+      [t.stat3_n || "11", "", t.stat3_label || "sabores con actitud"],
     ];
 
     return (
@@ -98,12 +113,12 @@
             </Reveal>
 
             <h1 className="mt-5 font-display text-[clamp(2.9rem,6.6vw,5.4rem)] uppercase leading-[0.9] tracking-[0.005em] text-[var(--ink)]">
-              {["La papa", "que se", "porta"].map((t, i) => (
-                <Reveal key={t} as="span" delay={0.08 + i * 0.07} className="block">{t}</Reveal>
+              {lines.map((t2, i) => (
+                <Reveal key={t2 + i} as="span" delay={0.08 + i * 0.07} className="block">{t2}</Reveal>
               ))}
               <Reveal key="mal" as="span" delay={0.28} className="block">
                 <span className="relative inline-block">
-                  <span className="text-[var(--clay)]">mal</span>
+                  <span className="text-[var(--clay)]">{accentLine}</span>
                   <span className="text-[var(--ink)]">.</span>
                   <motion.span
                     className="absolute -bottom-[0.04em] left-0 z-0 block h-[0.1em] w-[1.55em] bg-[var(--clay)]"
@@ -116,25 +131,24 @@
             </h1>
 
             <Reveal delay={0.36} className="mt-7 max-w-[34ch] text-[16.5px] font-medium leading-relaxed text-[var(--ink)]/70">
-              Malanga rebanada a mano, horneada en lotes pequeños y preparada con ingredientes de calidad.
-              Crujiente con mala actitud, pero buena conciencia.
+              {description}
             </Reveal>
 
             <Reveal delay={0.4} className="mt-8 flex flex-wrap items-center gap-3">
               <BuyButton
-                label="Comprar a Mayoreo" price="$1550"
-                waMessage="Hola Papa Mala 👋 Me interesa una compra a mayoreo. ¿Me pueden dar más información?"
+                label={buyLabel} price={buyPrice}
+                waMessage={buyMessage}
               />
               <GhostButton href="#sabores">Ver sabores <Ico.Arrow /></GhostButton>
             </Reveal>
 
             <Reveal delay={0.48} className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-3">
-              {STATS.map(([n, suf, t]) => (
-                <div key={t} className="flex items-baseline gap-2">
+              {STATS.map(([n, suf, t3]) => (
+                <div key={t3} className="flex items-baseline gap-2">
                   {n !== null
                     ? <><CountUp value={Number(n)} suffix={suf} className="font-display text-[30px] leading-none text-[var(--clay)]" />
-                        <span className="max-w-[10ch] text-[12.5px] font-semibold leading-tight text-[var(--ink)]/60">{t}</span></>
-                    : <span className="font-display text-[22px] uppercase leading-tight tracking-tight text-[var(--clay)]">{t}</span>
+                        <span className="max-w-[10ch] text-[12.5px] font-semibold leading-tight text-[var(--ink)]/60">{t3}</span></>
+                    : <span className="font-display text-[22px] uppercase leading-tight tracking-tight text-[var(--clay)]">{t3}</span>
                   }
                 </div>
               ))}

@@ -26,7 +26,14 @@
   }
 
   /* Sección completa */
-  function ContactSection() {
+  function ContactSection({ cmsText = null }) {
+    const t = cmsText || {};
+    const eyebrow = t.eyebrow || "¿hablamos?";
+    const title1 = t.title1 || "Pide a";
+    const title2 = t.title2 || "mayoreo";
+    const description = t.description ||
+      "Déjanos tus datos y te contactamos para surtir tu tienda, evento o antojo en grande.";
+
     const [open,  setOpen]  = useState(false);
     const [state, setState] = useState("idle"); // idle | sending | done
     const [form,  setForm]  = useState({ nombre: "", correo: "", telefono: "", ciudad: "", mensaje: "" });
@@ -73,14 +80,14 @@
         <div className="halftone pointer-events-none absolute inset-0 opacity-[0.08]" />
         <div className="relative mx-auto max-w-[1280px] px-5 text-center md:px-10">
 
-          <Reveal><span className="font-scrawl text-[26px] font-bold text-[var(--clay)]">¿hablamos?</span></Reveal>
+          <Reveal><span className="font-scrawl text-[26px] font-bold text-[var(--clay)]">{eyebrow}</span></Reveal>
           <Reveal delay={0.06}>
             <h2 className="mt-1 font-display text-[clamp(2.2rem,5.5vw,4rem)] uppercase leading-[0.9] tracking-tight text-[var(--ink)]">
-              Pide a <span className="text-[var(--clay)]">mayoreo</span>
+              {title1} <span className="text-[var(--clay)]">{title2}</span>
             </h2>
           </Reveal>
           <Reveal delay={0.12} className="mx-auto mt-4 max-w-[44ch] text-[16px] font-medium leading-relaxed text-[var(--ink)]/65">
-            Déjanos tus datos y te contactamos para surtir tu tienda, evento o antojo en grande.
+            {description}
           </Reveal>
 
           {/* Botón toggle */}

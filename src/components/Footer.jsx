@@ -2,7 +2,19 @@
 // Pie de página con logo, descripción, Instagram y botón de compra.
 
 (function () {
-  function Footer() {
+  function Footer({ cmsText = null }) {
+    const t = cmsText || {};
+    const description = t.description ||
+      "Snacks saludables de malanga, hechos en lotes pequeños. La papa que se porta mal, pero te quiere bien.";
+    const instagram = t.instagram || "@lapapamala";
+    const instagramUrl = t.instagramUrl || "https://www.instagram.com/lapapamala/";
+    const buyLabel = t.buyLabel || "¡COMPRA YA!";
+    const buyPrice = t.buyPrice || "$35 c/u";
+    const buyMessage = t.buyMessage ||
+      "Hola Papa Mala 👋 Quiero comprar bolsas a $35 c/u. ¿Cuántos sabores tienen disponibles?";
+    const copyright = t.copyright || "© 2026 Papa Mala · Hecho en México";
+    const tagline = t.tagline || "Malanga real · Sin gluten · Lotes pequeños";
+
     return (
       <footer className="border-t-2 border-[var(--ink)] bg-[var(--ink)] text-[var(--bone)]">
         <div className="mx-auto max-w-[1280px] px-5 py-14 md:px-10">
@@ -16,19 +28,19 @@
                 <span className="font-display text-[40px] uppercase leading-none tracking-tight">Papa Mala</span>
               </div>
               <p className="mt-5 max-w-[44ch] text-[15px] font-medium leading-relaxed text-[var(--bone)]/65">
-                Snacks saludables de malanga, hechos en lotes pequeños. La papa que se porta mal, pero te quiere bien.
+                {description}
               </p>
-              <a href="https://www.instagram.com/lapapamala/" target="_blank" rel="noopener noreferrer"
+              <a href={instagramUrl} target="_blank" rel="noopener noreferrer"
                 className="mt-4 block font-scrawl text-[24px] text-[var(--clay)] no-underline transition-colors hover:opacity-80">
-                @lapapamala
+                {instagram}
               </a>
             </div>
 
             {/* Columna derecha */}
             <div className="flex flex-col items-start gap-4 md:items-end">
               <BuyButton
-                label="¡COMPRA YA!" price="$35 c/u"
-                waMessage="Hola Papa Mala 👋 Quiero comprar bolsas a $35 c/u. ¿Cuántos sabores tienen disponibles?"
+                label={buyLabel} price={buyPrice}
+                waMessage={buyMessage}
               />
               <div className="flex flex-wrap gap-x-5 gap-y-1 text-[13px] font-bold uppercase tracking-tight text-[var(--bone)]/55 md:justify-end">
                 <a href="#sabores"  className="no-underline hover:text-[var(--bone)]">Sabores</a>
@@ -42,8 +54,8 @@
 
           {/* Copyright */}
           <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--bone)]/15 pt-6 text-[12px] font-semibold uppercase tracking-tight text-[var(--bone)]/40">
-            <span>© 2026 Papa Mala · Hecho en México</span>
-            <span>Malanga real · Sin gluten · Lotes pequeños</span>
+            <span>{copyright}</span>
+            <span>{tagline}</span>
           </div>
         </div>
       </footer>
