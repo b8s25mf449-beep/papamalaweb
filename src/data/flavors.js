@@ -10,7 +10,7 @@ window.FLAVORS = [
   { id: "fl-adobadas",  name: "Adobadas",       note: "Adobo con chiles",       tint: "#A8341C", ink: "#FAF7F2", kcal: "137", tag: "Picante",   price: 35 },
   { id: "fl-especias",  name: "Especias",       note: "Mezcla de especias",     tint: "#7C5A2E", ink: "#FAF7F2", kcal: "131", tag: "Especiado", price: 35 },
   { id: "fl-ruffles",   name: "Ruffles",        note: "Clásico ondulado",       tint: "#C9A36B", ink: "#0F0D0D", kcal: "133", tag: "Clásico",   price: 35 },
-  { id: "fl-hotnuts",   name: "Hot Nuts",       note: "Cacahuate enchilado",    tint: "#8B0000", ink: "#FAF7F2", kcal: "145", tag: "Brutal",    price: 35 },
+  { id: "fl-hotnuts",   name: "Hot Nuts",       note: "Hot Nuts",    tint: "#8B0000", ink: "#FAF7F2", kcal: "145", tag: "Brutal",    price: 35 },
   { id: "fl-esquite",   name: "Esquite",        note: "Elote, mayo & limón",    tint: "#E0B23A", ink: "#0F0D0D", kcal: "139", tag: "Antojito",  price: 35 },
   { id: "fl-bbq",       name: "BBQ",            note: "Barbacoa dulce ahumada", tint: "#5A3417", ink: "#FAF7F2", kcal: "141", tag: "Ahumado",   price: 35 },
 ];
